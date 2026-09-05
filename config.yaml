@@ -1,0 +1,71 @@
+# config.yaml (追加部分)
+model:
+  in_feats: 100
+  hidden_dim: 256
+  out_dim: 32
+  num_layers: 3
+
+
+prototype:
+  num_prototypes: 7
+  context_hidden: 256
+  temperature: 0.9
+  tau_cert: 0.1
+ # === 概念解释提取 ===
+  expl_strategy: 'entropy_topk'  # 或 'threshold', 'topk'
+  expl_k: 2                     # 每个节点保留几个原型
+  expl_tau: 0.3                  # threshold 策略的阈值
+
+ot:
+  epsilon: 0.05
+  max_iter: 5
+  tol: 1e-6
+
+graph:
+  diffusion_alpha: 0
+
+llm:
+  lambda: 0.5
+
+loss:
+  w_centroid: 1.0
+  w_contrast: 0.5
+ # === 概念忠实度损失权重 ===
+  w_suff: 0.2      # 充分性：只用解释原型时预测应不变
+  w_nec: 0.2        # 必要性：去掉解释原型时预测应变
+  w_sparse: 0     # 全局门控 L1 稀疏
+  w_gate_entropy: 0.001  # 门控熵正则（鼓励离散）
+ # === 暂时不用损失权重 ===
+  w_context: 0
+  w_task: 1.0
+  w_mask_align: 0.1   # 自适应掩码与硬解释的对齐
+  w_adapt_suff: 0.2  # 自适应掩码的充分性
+
+
+
+optim:
+  lr: 0.001
+  weight_decay: 0.0001
+
+device: cuda
+
+# 新增：概念图与表示学习参数
+concept_graph:
+  knn_k: 0               # 概念图稀疏连接的 k 值
+  num_layers: 1           # 原型概念图推理的 GNN/Transformer 层数
+  dropout: 0.2
+  use_struct: true        # 是否使用结构共现相似度
+  use_context: true       # 是否使用区域上下文相似度
+  use_semantic: false      # 是否使用 LLM 语义相似度
+  fusion_mode: "attention"      # 多模态边权重融合方式: add, max, attention
+  cg_adj_mode: None
+  cg_fusion_mode: 'attention'
+
+conditioned_gnn:
+  num_layers: 3           # 原型条件化 GNN 的层数
+  hidden_dim: 256
+  out_dim: 32            # 最终节点表示维度
+  use_hypernet: true      # 是否使用超网络生成原型专属权重
+  hyper_hidden: 32        # 超网络隐层维度
+  residual: False         # 是否与原始 GNN 嵌入做残差连接
+  pc_attn_mode: "simple"
