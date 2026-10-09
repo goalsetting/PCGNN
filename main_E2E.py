@@ -22,7 +22,7 @@ import numpy as np
 from collections import defaultdict
 
 
-def split_stratified_mask(labels, train_ratio=0.2, val_ratio=0.2, test_ratio=0.6, seed=42):
+def split_stratified_mask(labels, train_ratio=0.6, val_ratio=0.2, test_ratio=0.2, seed=42):
     """
     按类别分层随机划分训练/验证/测试集，返回布尔掩码。
     确保每个类别中 train_ratio / val_ratio / test_ratio 的样本被分配到对应集合。
